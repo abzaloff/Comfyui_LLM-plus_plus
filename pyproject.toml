@@ -1,0 +1,17 @@
+[project]
+name = "llm-plus-plus"
+version = "1.0.0"
+description = "Generate and improve image prompts in ComfyUI with cloud or local language models."
+license = { file = "LICENSE.md" }
+dependencies = [
+    "requests",
+    "Pillow",
+    "numpy",
+]
+
+[project.urls]
+Repository = "https://github.com/abzaloff/Comfyui_LLM-plus_plus"
+
+[tool.comfy]
+PublisherId = "abzaloff"
+DisplayName = "ComfyUI LLM++"
