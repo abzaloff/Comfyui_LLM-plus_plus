@@ -196,6 +196,35 @@ function setNodePrompt(node, text) {
     node.setDirtyCanvas(true, true);
 }
 
+function enablePromptSpellcheck(widget) {
+    const selector = 'textarea, input[type="text"], [contenteditable="true"]';
+    for (const root of [widget?.element, widget?.inputEl]) {
+        if (!root) {
+            continue;
+        }
+        const fields = root.matches?.(selector)
+            ? [root]
+            : root.querySelectorAll?.(selector) || [];
+        for (const field of fields) {
+            if (field.dataset.llmPlusSpellcheck) {
+                continue;
+            }
+            field.dataset.llmPlusSpellcheck = "true";
+            field.spellcheck = true;
+            const updateLanguage = () => {
+                const value = field.value ?? field.textContent ?? "";
+                const cyrillic = (value.match(/[\u0400-\u04FF]/g) || []).length;
+                const latin = (value.match(/[A-Za-z]/g) || []).length;
+                if (cyrillic || latin) {
+                    field.lang = cyrillic > latin ? "ru" : "en";
+                }
+            };
+            field.addEventListener("input", updateLanguage);
+            updateLanguage();
+        }
+    }
+}
+
 function getStoredPresetName(node) {
     return String(node.properties?.[SELECTED_PRESET_PROPERTY] || "").trim();
 }
@@ -335,7 +364,7 @@ function createPresetEditor(node, state) {
         </label>
         <label>
             Text
-            <textarea data-field="text" spellcheck="false"></textarea>
+            <textarea data-field="text" spellcheck="true"></textarea>
         </label>
         <div class="llm-plus-preset-actions">
             <button data-action="new" type="button">New</button>
@@ -352,6 +381,7 @@ function createPresetEditor(node, state) {
     const select = dialog.querySelector('[data-field="select"]');
     const nameInput = dialog.querySelector('[data-field="name"]');
     const textInput = dialog.querySelector('[data-field="text"]');
+    enablePromptSpellcheck({ element: textInput });
     const status = dialog.querySelector('[data-field="status"]');
     let originalName = "";
 
@@ -516,6 +546,17 @@ app.registerExtension({
                 return originalConfigure?.apply(this, arguments);
             };
             const promptWidget = this.widgets?.find((item) => item.name === "prompt");
+            const improveWidget = this.widgets?.find((item) => item.name === "Prompt to Improve");
+            for (const widget of [promptWidget, improveWidget]) {
+                enablePromptSpellcheck(widget);
+            }
+            if (typeof requestAnimationFrame === "function") {
+                requestAnimationFrame(() => {
+                    for (const widget of [promptWidget, improveWidget]) {
+                        enablePromptSpellcheck(widget);
+                    }
+                });
+            }
             const initialPromptValue = promptWidget?.value;
             const storedPresetName = getStoredPresetName(this);
             const presetState = {
