@@ -13,6 +13,7 @@ from PIL import Image
 
 from .config import load_config, update_config
 from .presets import delete_preset, get_preset, list_presets, save_preset
+from .user_prompt_node import LLMPlusUserPrompt
 
 
 LOGGER = logging.getLogger(__name__)
@@ -698,8 +699,10 @@ register_routes()
 
 NODE_CLASS_MAPPINGS = {
     "LLMPlusPrompt": LLMPlusPrompt,
+    "LLMPlusUserPrompt": LLMPlusUserPrompt,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
     "LLMPlusPrompt": "LLM++ Prompt",
+    "LLMPlusUserPrompt": "User_Prompt",
 }

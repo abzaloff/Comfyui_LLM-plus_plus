@@ -1,3 +1,4 @@
 requests
 Pillow
 numpy
+googletrans-py==4.0.0

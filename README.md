@@ -35,10 +35,11 @@ Required Python packages:
 - `requests`
 - `Pillow`
 - `numpy`
+- `googletrans-py==4.0.0` (for the separate `User_Prompt` translation node)
 
-These packages are usually already available in ComfyUI. If they are missing,
-install `requirements.txt` using the same Python or UV environment that runs
-ComfyUI.
+`requests`, `Pillow`, and `numpy` are usually already available in ComfyUI.
+Install `requirements.txt` using the same Python or UV environment that runs
+ComfyUI to enable the new translation node.
 
 ## API Settings
 
@@ -136,6 +137,25 @@ needs them. The output remains a `STRING` that can be connected to
 `CLIP Text Encode`. The encoder must
 support ComfyUI's `TextGenerate` operations; a conditioning-only encoder will
 not work.
+
+## User_Prompt node
+
+`User_Prompt` is a separate node in the `LLM++` category. Type or paste text
+into `positive` and connect its `positive` STRING output to another node, such
+as `Prompt to Improve` on `LLM++ Prompt`.
+New nodes start with translation enabled from Russian to English, as in the
+example workflow.
+
+- `enable_translate` off: output the text exactly as entered, without a network
+  request.
+- `enable_translate` on: translate the text with Google Translate. Choose
+  `auto` as the source language for text in any language, or select `ru` or `en`
+  when the source language is known. Choose `ru` or `en` as the output language.
+
+Translation requires an internet connection. It uses the unofficial
+`googletrans-py` library and does not require an API key. If the translation
+service fails, ComfyUI reports the error instead of silently returning the
+original text.
 
 ## Prompt Presets
 

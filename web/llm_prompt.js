@@ -532,6 +532,25 @@ app.registerExtension({
     },
 
     async beforeRegisterNodeDef(nodeType, nodeData) {
+        if (nodeData.name === "LLMPlusUserPrompt") {
+            const originalCreated = nodeType.prototype.onNodeCreated;
+            nodeType.prototype.onNodeCreated = function () {
+                originalCreated?.apply(this, arguments);
+                colorizeBooleanWidget(
+                    this.widgets?.find((item) => item.name === "enable_translate"),
+                );
+                const positiveWidget = this.widgets?.find((item) => item.name === "positive");
+                enablePromptSpellcheck(positiveWidget);
+                if (typeof requestAnimationFrame === "function") {
+                    requestAnimationFrame(() => enablePromptSpellcheck(positiveWidget));
+                }
+                this.setSize?.([
+                    Math.max(this.size?.[0] ?? 0, 350),
+                    Math.max(this.size?.[1] ?? 0, 400),
+                ]);
+            };
+            return;
+        }
         if (nodeData.name !== "LLMPlusPrompt") {
             return;
         }
